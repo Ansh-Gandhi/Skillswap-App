@@ -1,0 +1,38 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  name String
+  email String  @unique
+  password String
+  offeredSkills Skill[] @relation("UserOfferSkills")
+  wantedSkills Skill[] @relation("UserWantSkills")
+  reviewsGiven Review[] @relation("UserReviewsGiven")
+  reviewsReceived Review[] @relation("UserReviewsReceived")
+  createdAt DateTime @default(now())
+}
+
+model Skill {
+  id Int @id @default(autoincrement())
+  name String @unique
+  offeredBy User[] @relation("UserOfferSkills")
+  wantedBy User[] @relation("UserWantSkills")
+}
+
+model Review {
+  id Int @id @default(autoincrement())
+  rating Int
+  comment String?
+  reviewer User @relation("UserReviewsGiven", fields: [reviewerId], references: [id])
+  reviewerId Int
+  reviewee User @relation("UserReviewsReceived", fields: [revieweeId], references: [id])
+  revieweeId Int
+  createdAt DateTime @default(now())
+}
